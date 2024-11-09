@@ -1,0 +1,69 @@
+---
+title: "Assignment_2"
+author: "Milo"
+date: '2022-05-07'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+### Add packages you use in Assignment 2
+
+library("plyr")
+library("tidyverse")
+library("nlme")
+library("car")
+library("hexbin")
+library("xtable")
+library("knitr")
+library("lmerTest")
+```
+```{r}
+## Importing the Veneer data file from my computer.
+
+Veneer <- read.csv(file = 'Veneer.csv', header = TRUE)
+View(Veneer)
+```
+
+```{r}
+Veneer <- mutate(Veneer, Adult.f = factor(Adult), G.f = factor(G))
+View(Veneer)
+```
+
+
+```{r}
+Model1 <- lme(C ~ A + W + G.f + A : W + A : G.f + W : G.f + A : W : G, random = ~ 1 | Adult.f, method = "REML",  correlation = corCompSymm(), weights = varIdent(form = ~ 1 | G.f), data = Veneer)
+```
+
+```{r}
+D_hat <- getVarCov(Model1)[-3,] # Gives the D matrix
+round(D_hat,2)
+```
+```{r}
+R_hat3 <- getVarCov(Model1, individual = 23, type = "conditional")[[1]] 
+R_hat3
+```
+```{r}
+VarY_hat12 <- getVarCov(Model1, individual = 12, type = "marginal")[[1]] 
+round(VarY_hat12,2)
+```
+
+```{r}
+sum_model1<-round(coef(summary(Model1)),2)
+```
+```{r}
+Table_2 <- xtable(sum_model1, align = "cccccc", digits = c(2,2,2,2,2,2), label = 'Table 2', caption = 'Estimate of fixed effects in model 1')
+print(Table_2, include.rownames = TRUE, caption.placement = "top", file = "Table1.tex", append = TRUE)
+```
+
+
+
