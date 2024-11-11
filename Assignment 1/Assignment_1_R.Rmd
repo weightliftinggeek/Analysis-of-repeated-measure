@@ -26,7 +26,6 @@ library("hexbin")
 library("xtable")
 library("knitr")
 library("lmerTest")
-library("ggplot2")
 ```
 ```{r}
 ## Importing the RatBrain data file from my computer.
